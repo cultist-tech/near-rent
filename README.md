@@ -1,27 +1,62 @@
-# NFT RENT
+Rent
+===================
 
-Реализовать возможность передавать NFT на определенное время. По истечению срока аренды, NFT возвращается её холдеру. Сделать возможность оплачивать аренду за любой FT или NEAR.
+This repository includes an implementation of a rent contract.
 
-```rust
-pub trait RentFactoryCore {
-  // список
-  fn rent_token_is_locked(&self, nft_contract_id: AccountId, token_id: TokenId) -> bool;
+Introduction
+=============
 
-  // обновить оффер
-  fn rent_update(&mut self, nft_contract_id: AccountId, token_id: TokenId, price_per_hour: U128, min_time: u64, max_time: u64);
-  // убрать оффер с маркета
-  fn rent_remove(&mut self, nft_contract_id: AccountId, token_id: TokenId);
+It is possible to transfer an NFT for a certain period of time. At the end of the lease term, the NFT is returned to its holder. It is also possible to pay the rent for any FT or NEAR.
 
-  // оплатить аренду (купить)
-  fn rent_pay(&mut self, nft_contract_id: AccountId, token_id: TokenId, time: u64, receiver_id: AccountId) -> Promise;
-  // забрать токен после аренды
-  fn rent_claim(&mut self, nft_contract_id: AccountId, token_id: TokenId) -> Promise;
+Prerequisites
+=============
 
-  // узнать закончилась ли аренда
-  fn rent_is_ended(&self, nft_contract_id: AccountId, token_id: TokenId) -> bool;
-  // кол-во офферов аренды
-  fn rent_total_supply(&self) -> u64;
+  * Make sure Rust is installed per the prerequisites in [`near-sdk-rs`](https://github.com/near/near-sdk-rs).
+  * Make sure [near-cli](https://github.com/near/near-cli) is installed.
 
-  fn rent_is_approved(&self, nft_contract_id: AccountId, token_id: TokenId, account_id: AccountId) -> bool;
-}
+Explore this contract
+=====================
+
+The source for this contract is in `/src/lib.rs`.
+
+Building this contract
+======================
+Run the following, and we'll build our rust project up via cargo. This will generate our WASM binaries into our `res/` directory. This is the smart contract we'll be deploying onto the NEAR blockchain later.
+```bash
+sh ./scripts/build.sh
+```
+
+Using this contract
+===================
+
+### Quickest deploy
+
+You can build and deploy this smart contract to a development account. [Dev Accounts](https://docs.near.org/docs/concepts/account#dev-accounts) are auto-generated accounts to assist in developing and testing smart contracts. Please see the [Standard deploy](#standard-deploy) section for creating a more personalized account to deploy to.
+
+```bash
+sh ./scripts/dev-deploy.sh
+```
+
+Behind the scenes, this is creating an account and deploying a contract to it. On the console, notice a message like:
+
+>Done deploying to dev-1234567890123
+
+In this instance, the account is `dev-1234567890123`. A file has been created containing a key pair to
+the account, located at `neardev/dev-account`. To make the next few steps easier, we're going to set an
+environment variable containing this development account id and use that when copy/pasting commands.
+Run this command to set the environment variable:
+
+```bash
+source ./scripts/neardev/dev-account.env
+```
+
+You can tell if the environment variable is set correctly if your command line prints the account name after this command:
+```bash
+echo $CONTRACT_NAME
+```
+
+The next command will initialize the contract using the `new` method:
+
+```bash
+near call $CONTRACT_NAME new_default_meta '{"owner_id": "'$CONTRACT_NAME'"}' --accountId $CONTRACT_NAME
 ```
